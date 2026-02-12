@@ -30,7 +30,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfile.objects.get(user__id=user_id)
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]  # You might want to use `IsAuthenticated` if only logged-in users can leave reviews
+    permission_classes = [AllowAny]  
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
@@ -428,26 +428,26 @@ class VerifyPaymentView(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            # Get payment ID and order ID from the frontend
+         
             razorpay_payment_id = request.data.get('razorpay_payment_id')
             razorpay_order_id = request.data.get('razorpay_order_id')
 
             if not razorpay_payment_id or not razorpay_order_id:
                 return Response({"error": "Payment ID and Order ID are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Verify the payment with Razorpay
+            
             try:
-                client.payment.fetch(razorpay_payment_id)  # Fetch the payment details
+                client.payment.fetch(razorpay_payment_id)  
             except razorpay.errors.BadRequestError:
                 return Response({"error": "Invalid payment ID."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Fetch the corresponding Payment record
+          
             try:
                 payment = Payment.objects.get(order_id=razorpay_order_id, user=request.user)
             except Payment.DoesNotExist:
                 return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
-            # Update payment status if verified successfully
+           
             payment.status = 'Paid'
             payment.save()
 
@@ -456,24 +456,22 @@ class VerifyPaymentView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# 1. View to List Available Coupons
+
 class CouponListView(APIView):
-    permission_classes = [AllowAny] # Or IsAuthenticated
+    permission_classes = [AllowAny] 
 
     def get(self, request):
-        # Only show active coupons
         coupons = Coupon.objects.filter(active=True)
         serializer = CouponSerializer(coupons, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# 2. View to Apply a Coupon
 class ApplyCoupon(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         code = request.data.get('code')
         try:
-            # Safely convert price to float
+           
             original_price = float(request.data.get('totalPriceWithGST', 0))
         except (ValueError, TypeError):
             return Response({"error": "Invalid price format"}, status=status.HTTP_400_BAD_REQUEST)
@@ -486,12 +484,10 @@ class ApplyCoupon(APIView):
         except Coupon.DoesNotExist:
             return Response({"error": "Invalid or Expired Coupon"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Calculate Discount
+       
         discount_percentage = float(coupon.discount)
         discount_amount = original_price * (discount_percentage / 100)
         
-        # Optional: Cap max discount if needed (e.g., max ₹500 off)
-        # if discount_amount > 500: discount_amount = 500
 
         final_price = original_price - discount_amount
         
