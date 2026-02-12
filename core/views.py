@@ -16,6 +16,7 @@ from django.db.models import Min
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from razorpay import Client
+
 User = get_user_model()
 
 
@@ -253,8 +254,8 @@ class PlaceOrderView(APIView):
             except KeyError:
                 return Response({'error': 'Invalid service data format'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(BookingSerializer(created_bookings, many=True).data, status=status.HTTP_201_CREATED)
-
+            return Response(BookingSerializer(created_bookings, many=True).data, status=status.HTTP_201_CREATED)
+    
 
 class EmployeeDashboardView(APIView):
     permission_classes = [IsAuthenticated]
