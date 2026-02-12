@@ -82,7 +82,7 @@ class Payment(models.Model):
     
 class Coupon(models.Model):
     code = models.CharField(max_length=10, unique=True)
-    discount = models.DecimalField(max_digits=5, decimal_places=2) # e.g., 10.00 for 10%
+    discount = models.DecimalField(max_digits=5, decimal_places=2) 
     active = models.BooleanField(default=True)
 
     def __str__(self):
