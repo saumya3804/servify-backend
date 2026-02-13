@@ -353,13 +353,13 @@ class ServiceCategoryListView(APIView):
 
 
 
-client = razorpay.Client(auth=(os.getenv("RAZORPAY_API_KEY"),os.getenv("RAZORPAY_API_SECRET")))
+
 
 class PaymentView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self, request, *args, **kwargs):
         try:
-            
+            client = razorpay.Client(auth=(os.getenv("RAZORPAY_API_KEY"),os.getenv("RAZORPAY_API_SECRET")))
             totalPrice = request.data.get('totalPriceWithGST')
 
             if not totalPrice:
