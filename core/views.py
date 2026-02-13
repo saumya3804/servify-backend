@@ -359,8 +359,10 @@ class PaymentView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self, request, *args, **kwargs):
         try:
-            key_id = os.getenv("RAZORPAY_API_KEY")
-            key_secret = os.getenv("RAZORPAY_API_SECRET")
+            raw_key = os.getenv("RAZORPAY_API_KEY")
+            raw_secret= os.getenv("RAZORPAY_API_SECRET")
+            key_id = raw_key.strip().replace('"', '').replace("'", "")
+            key_secret = raw_secret.strip().replace('"', '').replace("'", "")
 
             print("--- RAZORPAY DEBUG START ---")
             print(f"Key ID Type: {type(key_id)}")
@@ -380,6 +382,7 @@ class PaymentView(APIView):
             print("--- RAZORPAY DEBUG END ---")
 
             client = razorpay.Client(auth=(key_id, key_secret))
+            
             totalPrice = request.data.get('totalPriceWithGST')
 
             if not totalPrice:
@@ -457,7 +460,11 @@ class VerifyPaymentView(APIView):
 
             
             try:
-                client = razorpay.Client(auth=(os.getenv("RAZORPAY_API_KEY"), os.getenv("RAZORPAY_API_SECRET")))
+                raw_key = os.getenv("RAZORPAY_API_KEY")
+                raw_secret= os.getenv("RAZORPAY_API_SECRET")
+                key_id = raw_key.strip().replace('"', '').replace("'", "")
+                key_secret = raw_secret.strip().replace('"', '').replace("'", "")
+                client = razorpay.Client(auth=(key_id, key_secret))
                 client.payment.fetch(razorpay_payment_id)  
             except razorpay.errors.BadRequestError:
                 return Response({"error": "Invalid payment ID."}, status=status.HTTP_400_BAD_REQUEST)
