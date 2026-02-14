@@ -28,4 +28,5 @@ urlpatterns = [
     path('coupons/', CouponListView.as_view(), name='list-coupons'),
     path('apply-coupon/', ApplyCoupon.as_view(), name='apply-coupon'),
     path('', include(router.urls)),
+    path('chat/', gemini_chat_view, name='gemini_chat'),
 ]
